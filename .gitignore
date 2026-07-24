@@ -10,6 +10,11 @@ app/dist/
 games.csv
 *.csv
 
+# PowerPoint presentations
+*.ppt
+*.pptx
+~$*.pptx
+
 # Python cache & virtual environments
 __pycache__/
 *.pyc
