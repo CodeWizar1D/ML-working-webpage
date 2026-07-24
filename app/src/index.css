@@ -1,0 +1,47 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #070b14;
+    background-image: 
+      radial-gradient(circle at 50% 0%, #0d1527 0%, #070b14 75%),
+      linear-gradient(rgba(0, 242, 254, 0.02) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 242, 254, 0.02) 1px, transparent 1px);
+    background-size: 100% 100%, 36px 36px, 36px 36px;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    background: rgba(13, 21, 39, 0.75);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(0, 242, 254, 0.15);
+    border-radius: 0.85rem;
+  }
+
+  .nav-link {
+    @apply px-3 py-2 text-sm font-semibold text-white/50 hover:text-white hover:bg-white/5 rounded-lg transition-all;
+  }
+
+  .nav-link-active {
+    @apply text-neon-cyan bg-neon-cyan/10 border border-neon-cyan/30 shadow-neon-cyan;
+  }
+
+  .btn-neon {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-neon-cyan/10 border border-neon-cyan/40 text-neon-cyan font-display font-bold text-sm hover:bg-neon-cyan hover:text-void hover:shadow-neon-cyan transition-all duration-300;
+  }
+
+  .btn-neon-purple {
+    @apply inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-lg bg-neon-purple/10 border border-neon-purple/40 text-neon-purple font-display font-bold text-sm hover:bg-neon-purple hover:text-white hover:shadow-neon-purple transition-all duration-300;
+  }
+
+  .neon-border-cyan {
+    @apply border border-neon-cyan/20 hover:border-neon-cyan/60 hover:shadow-neon-cyan;
+  }
+
+  .neon-border-purple {
+    @apply border border-neon-purple/20 hover:border-neon-purple/60 hover:shadow-neon-purple;
+  }
+}
