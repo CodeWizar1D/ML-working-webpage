@@ -1,16 +1,25 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import GameCard from '../components/GameCard';
 import FilterPills from '../components/FilterPills';
-import { games } from '../data/gamesData';
+import { games, loadFullDataset } from '../data/gamesData';
 
 export default function Browse() {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [sortBy, setSortBy] = useState('rating');
-  const [visibleCount, setVisibleCount] = useState(30);
+  const [visibleCount, setVisibleCount] = useState(20);
+  const [catalog, setCatalog] = useState(games);
+
+  useEffect(() => {
+    loadFullDataset().then((fullList) => {
+      if (Array.isArray(fullList)) {
+        setCatalog(fullList);
+      }
+    });
+  }, []);
 
   const filteredGames = useMemo(() => {
-    let result = [...games];
+    let result = [...catalog];
 
     if (selectedGenres.length > 0) {
       result = result.filter((g) => {
@@ -20,7 +29,6 @@ export default function Browse() {
     }
 
     if (selectedPlatform === 'pc') {
-      // PC includes all games in this Steam PC dataset
       result = result.filter((g) => (g.platforms || []).includes('pc') || true);
     } else if (selectedPlatform === 'mac') {
       result = result.filter((g) => (g.platforms || []).includes('mac') || (g.platforms || []).includes('apple'));
@@ -37,7 +45,7 @@ export default function Browse() {
     }
 
     return result;
-  }, [selectedGenres, selectedPlatform, sortBy]);
+  }, [catalog, selectedGenres, selectedPlatform, sortBy]);
 
   const visibleGames = useMemo(() => {
     return filteredGames.slice(0, visibleCount);
@@ -78,7 +86,7 @@ export default function Browse() {
                     type="button"
                     onClick={() => {
                       setSelectedPlatform(id);
-                      setVisibleCount(30);
+                      setVisibleCount(20);
                     }}
                     className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
                       selectedPlatform === id
@@ -123,7 +131,7 @@ export default function Browse() {
           <div className="text-center pt-6">
             <button
               type="button"
-              onClick={() => setVisibleCount((c) => c + 30)}
+              onClick={() => setVisibleCount((c) => c + 20)}
               className="btn-neon text-xs py-3 px-8 uppercase font-bold tracking-wider"
             >
               Load More Games ({filteredGames.length - visibleCount} remaining)

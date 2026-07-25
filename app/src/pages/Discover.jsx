@@ -1,11 +1,19 @@
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import HeroCarousel from '../components/HeroCarousel';
 import GameCard from '../components/GameCard';
-import { getHeroGames, getFeaturedGames } from '../data/gamesData';
+import { getHeroGames, getFeaturedGames, loadFullDataset } from '../data/gamesData';
 
 export default function Discover() {
-  const heroGames = getHeroGames();
-  const featured = getFeaturedGames();
+  const [heroGames, setHeroGames] = useState(getHeroGames());
+  const [featured, setFeatured] = useState(getFeaturedGames());
+
+  useEffect(() => {
+    loadFullDataset().then(() => {
+      setHeroGames(getHeroGames());
+      setFeatured(getFeaturedGames());
+    });
+  }, []);
 
   return (
     <div className="pb-12 animate-fade-in">
@@ -23,7 +31,7 @@ export default function Discover() {
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-5">
-            {featured.map((game, i) => (
+            {featured.slice(0, 15).map((game, i) => (
               <GameCard key={game.id} game={game} index={i} />
             ))}
           </div>
