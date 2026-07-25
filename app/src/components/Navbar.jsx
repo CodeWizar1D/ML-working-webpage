@@ -1,5 +1,5 @@
 import { NavLink, Link, useNavigate } from 'react-router-dom';
-import { USER } from '../data/gamesData';
+import { useUser } from '../context/UserContext';
 
 const NAV_ITEMS = [
   { to: '/', label: 'Discover', end: true },
@@ -11,6 +11,12 @@ const NAV_ITEMS = [
 
 export default function Navbar() {
   const navigate = useNavigate();
+  const { currentUser } = useUser();
+
+  const displayName = currentUser ? currentUser.name : 'Create Profile';
+  const avatarUrl = currentUser
+    ? currentUser.avatar
+    : 'https://api.dicebear.com/7.x/avataaars/svg?seed=Guest';
 
   return (
     <header className="relative z-50 glass-panel border-b border-white/10 rounded-none bg-void/85">
@@ -75,12 +81,12 @@ export default function Navbar() {
             className="flex items-center gap-2 pl-2 pr-3 py-1 rounded-full border border-white/10 hover:border-neon-purple/50 hover:shadow-neon-purple transition-all"
           >
             <img
-              src={USER.avatar}
-              alt={USER.displayName}
+              src={avatarUrl}
+              alt={displayName}
               className="w-7 h-7 rounded-full bg-surface border border-neon-cyan/30"
             />
             <span className="hidden lg:block text-sm font-semibold text-white/80">
-              {USER.displayName}
+              {displayName}
             </span>
           </Link>
         </div>
