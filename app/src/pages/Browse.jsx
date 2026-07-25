@@ -7,18 +7,25 @@ export default function Browse() {
   const [selectedGenres, setSelectedGenres] = useState([]);
   const [selectedPlatform, setSelectedPlatform] = useState('all');
   const [sortBy, setSortBy] = useState('rating');
+  const [visibleCount, setVisibleCount] = useState(30);
 
   const filteredGames = useMemo(() => {
     let result = [...games];
 
     if (selectedGenres.length > 0) {
-      result = result.filter((g) =>
-        g.genre.some((tag) => selectedGenres.includes(tag))
-      );
+      result = result.filter((g) => {
+        const gGenres = Array.isArray(g.genre) ? g.genre : [];
+        return gGenres.some((tag) => selectedGenres.includes(tag));
+      });
     }
 
-    if (selectedPlatform !== 'all') {
-      result = result.filter((g) => g.platforms.includes(selectedPlatform));
+    if (selectedPlatform === 'pc') {
+      // PC includes all games in this Steam PC dataset
+      result = result.filter((g) => (g.platforms || []).includes('pc') || true);
+    } else if (selectedPlatform === 'mac') {
+      result = result.filter((g) => (g.platforms || []).includes('mac') || (g.platforms || []).includes('apple'));
+    } else if (selectedPlatform === 'linux') {
+      result = result.filter((g) => (g.platforms || []).includes('linux'));
     }
 
     if (sortBy === 'rating') {
@@ -31,6 +38,10 @@ export default function Browse() {
 
     return result;
   }, [selectedGenres, selectedPlatform, sortBy]);
+
+  const visibleGames = useMemo(() => {
+    return filteredGames.slice(0, visibleCount);
+  }, [filteredGames, visibleCount]);
 
   return (
     <div className="px-4 lg:px-8 py-8 animate-fade-in">
@@ -56,18 +67,26 @@ export default function Browse() {
                 Platform
               </label>
               <div className="flex gap-2">
-                {['all', 'windows', 'apple', 'linux'].map((plat) => (
+                {[
+                  { id: 'all', label: 'All' },
+                  { id: 'pc', label: 'PC' },
+                  { id: 'mac', label: 'Mac' },
+                  { id: 'linux', label: 'Linux' },
+                ].map(({ id, label }) => (
                   <button
-                    key={plat}
+                    key={id}
                     type="button"
-                    onClick={() => setSelectedPlatform(plat)}
-                    className={`px-3 py-1 rounded-lg text-xs font-semibold uppercase ${
-                      selectedPlatform === plat
-                        ? 'bg-neon-cyan text-void font-bold'
-                        : 'bg-white/5 text-white/60 hover:text-white'
+                    onClick={() => {
+                      setSelectedPlatform(id);
+                      setVisibleCount(30);
+                    }}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all ${
+                      selectedPlatform === id
+                        ? 'bg-neon-cyan text-void font-black shadow-neon-cyan'
+                        : 'bg-white/5 text-white/60 hover:text-white hover:bg-white/10'
                     }`}
                   >
-                    {plat === 'apple' ? 'Mac' : plat}
+                    {label}
                   </button>
                 ))}
               </div>
@@ -80,7 +99,7 @@ export default function Browse() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value)}
-                className="bg-surface border border-white/10 rounded-lg px-3 py-1 text-xs font-semibold text-white/80 focus:border-neon-cyan outline-none"
+                className="bg-surface border border-white/10 rounded-lg px-3 py-1.5 text-xs font-semibold text-white/80 focus:border-neon-cyan outline-none"
               >
                 <option value="rating">Rating (Highest First)</option>
                 <option value="name">Title (A-Z)</option>
@@ -91,14 +110,26 @@ export default function Browse() {
         </div>
 
         <div className="flex items-center justify-between text-sm text-white/40">
-          <span>Showing <strong>{filteredGames.length}</strong> real Steam games</span>
+          <span>Showing <strong>{visibleGames.length}</strong> of <strong>{filteredGames.length}</strong> real Steam games</span>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 lg:gap-5">
-          {filteredGames.map((game, i) => (
+          {visibleGames.map((game, i) => (
             <GameCard key={game.id} game={game} index={i} />
           ))}
         </div>
+
+        {visibleCount < filteredGames.length && (
+          <div className="text-center pt-6">
+            <button
+              type="button"
+              onClick={() => setVisibleCount((c) => c + 30)}
+              className="btn-neon text-xs py-3 px-8 uppercase font-bold tracking-wider"
+            >
+              Load More Games ({filteredGames.length - visibleCount} remaining)
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );

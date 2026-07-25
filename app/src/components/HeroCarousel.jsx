@@ -34,6 +34,8 @@ export default function HeroCarousel({ games }) {
             <img
               src={game.image}
               alt={game.title}
+              loading="eager"
+              decoding="async"
               onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
               className="absolute inset-0 w-full h-full object-cover scale-105 group-hover:scale-110 transition-transform duration-[8000ms]"
             />

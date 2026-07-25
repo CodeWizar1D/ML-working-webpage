@@ -6,7 +6,9 @@ import { FALLBACK_IMAGE } from '../data/gamesData';
 const BORDER_VARIANTS = ['neon-border-purple', 'neon-border-cyan'];
 
 export default function GameCard({ game, index = 0, style = 'featured' }) {
+  if (!game) return null;
   const borderClass = BORDER_VARIANTS[index % BORDER_VARIANTS.length];
+  const coverImg = game.cover || game.image || FALLBACK_IMAGE;
 
   if (style === 'compact') {
     return (
@@ -16,8 +18,10 @@ export default function GameCard({ game, index = 0, style = 'featured' }) {
       >
         <div className="relative aspect-[3/4] overflow-hidden">
           <img
-            src={game.cover}
-            alt={game.title}
+            src={coverImg}
+            alt={game.title || 'Game'}
+            loading="lazy"
+            decoding="async"
             onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
           />
@@ -40,8 +44,10 @@ export default function GameCard({ game, index = 0, style = 'featured' }) {
     >
       <div className="relative aspect-[4/5] overflow-hidden">
         <img
-          src={game.cover}
-          alt={game.title}
+          src={coverImg}
+          alt={game.title || 'Game'}
+          loading={index < 4 ? 'eager' : 'lazy'}
+          decoding="async"
           onError={(e) => { e.target.src = FALLBACK_IMAGE; }}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
         />

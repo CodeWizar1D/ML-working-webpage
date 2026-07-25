@@ -82,11 +82,9 @@ class MLRecommender:
 
         label = "Overwhelmingly Positive" if pos_ratio >= 0.9 else ("Very Positive" if pos_ratio >= 0.75 else "Mixed")
 
-        platforms = []
-        if g.get("windows"): platforms.append("windows")
-        if g.get("mac"): platforms.append("apple")
+        platforms = ["pc"]
+        if g.get("mac") or g.get("apple"): platforms.append("mac")
         if g.get("linux"): platforms.append("linux")
-        if not platforms: platforms.append("windows")
 
         display_genres = g.get("tags", []) if g.get("tags") else g.get("genres", ["Action"])
 

@@ -30,18 +30,17 @@ export const GENRES = [
 // Fallback image if cover fails
 export const FALLBACK_IMAGE = 'https://images.unsplash.com/photo-1542751371-adc38448a05e?w=1200&h=600&fit=crop';
 
-// Map real raw games to GAMEZONE UI component props
+// Map real raw games (300 curated titles) to GAMEZONE UI component props
 export const games = rawGames.map((g, idx) => {
   const ratingVal = g.score > 0 ? g.score : (8.2 + (idx % 12) * 0.1);
   const totalRev = (g.positive || 0) + (g.negative || 0);
   const posRatio = totalRev > 0 ? (g.positive / totalRev) : 0.85;
   const matchPct = Math.min(99, Math.max(78, Math.round(ratingVal * 8.5 + (g.positive > 20000 ? 5 : 2))));
 
-  const platforms = [];
-  if (g.windows) platforms.push('windows');
-  if (g.mac) platforms.push('apple');
+  // Normalized Platform Rule: Every game is a Steam PC game ("pc"), Mac/Linux added if true in dataset
+  const platforms = ['pc'];
+  if (g.mac || g.apple) platforms.push('mac');
   if (g.linux) platforms.push('linux');
-  if (platforms.length === 0) platforms.push('windows');
 
   let tone = 'positive';
   let label = 'Very Positive';
@@ -77,7 +76,7 @@ export const games = rawGames.map((g, idx) => {
       score: Math.round(posRatio * 100),
       tone: tone
     },
-    releaseYear: str(g.year || '2024'),
+    releaseYear: String(g.year || '2024'),
     developer: g.developer || 'Game Studio',
     positive: g.positive || 0,
     negative: g.negative || 0,
@@ -85,28 +84,31 @@ export const games = rawGames.map((g, idx) => {
   };
 });
 
-function str(val) {
-  return String(val || '');
-}
+// Pre-computed lookup index & cached game lists for instant initial rendering
+const GAME_MAP = new Map(games.map((g) => [g.id, g]));
+const HERO_GAMES = games.filter((g) => g.hero).slice(0, 6);
+const FEATURED_GAMES = games.slice(0, 20);
+const TRENDING_GAMES = [...games].sort((a, b) => b.peak_ccu - a.peak_ccu).slice(0, 20);
+const TOP_RATED_GAMES = [...games].sort((a, b) => b.rating - a.rating).slice(0, 30);
 
 export function getGameById(id) {
-  return games.find((g) => String(g.id) === String(id));
+  return GAME_MAP.get(String(id));
 }
 
 export function getHeroGames() {
-  return games.filter((g) => g.hero).slice(0, 6);
+  return HERO_GAMES;
 }
 
 export function getFeaturedGames() {
-  return games.slice(0, 20);
+  return FEATURED_GAMES;
 }
 
 export function getTrendingGames() {
-  return [...games].sort((a, b) => b.peak_ccu - a.peak_ccu).slice(0, 20);
+  return TRENDING_GAMES;
 }
 
 export function getTopRatedGames() {
-  return [...games].sort((a, b) => b.rating - a.rating).slice(0, 30);
+  return TOP_RATED_GAMES;
 }
 
 export async function fetchMLRecommendations(selectedGenres = []) {
